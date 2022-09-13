@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import { ProjectType } from "../types/projectTypes";
 import { MONGO_URI } from "../utils/config";
 import HttpException from "../utils/httpExpcetion";
 
@@ -20,11 +19,5 @@ export const connectDB = async () => {
 export function validateObjectId(id: string){
     if(!mongoose.Types.ObjectId.isValid(id)){
         throw new HttpException(`${id} is not a valid Id`, 400);
-    }
-}
-
-export function validateObjectProperties(properties: ProjectType, callback?: void){
-    if(!properties.title){
-        throw new HttpException(`Title is required`, 400);
     }
 }

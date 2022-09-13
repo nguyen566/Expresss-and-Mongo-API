@@ -1,5 +1,6 @@
-import { validateObjectId, validateObjectProperties } from '../database/db';
+import { validateObjectId } from '../database/db';
 import ProjectModel from '../models/projectModel';
+import { sanitizeProject } from '../sanitizers/projectSanitizer';
 import { IProjectScehma } from '../schema/proejctSchema';
 import { ProjectType } from '../types/projectTypes';
 
@@ -16,9 +17,9 @@ export async function getProjects(): Promise<ProjectType[]> {
 }
 
 export async function createProject(project: ProjectType): Promise<ProjectType>{
-    validateObjectProperties(project);
+    const sanitizedProject = sanitizeProject(project);
     try {
-        const newProject = await ProjectModel.create(project);
+        const newProject = await ProjectModel.create(sanitizedProject);
         if(!newProject) throw new Error('Error with creating a project');
 
         return newProject;
@@ -40,9 +41,12 @@ export async function getProjectById(id: string): Promise<IProjectScehma>{
 }
 
 export async function updateProjectById(id: string, project: ProjectType): Promise<IProjectScehma>{
-    validateObjectProperties(project, validateObjectId(id));
+    validateObjectId(id);
+
+    const sanitizedProject = sanitizeProject(project);
+
     try {
-        const updateProject = await ProjectModel.findByIdAndUpdate(id, project, {
+        const updateProject = await ProjectModel.findByIdAndUpdate(id, sanitizedProject, {
             new: true
         })
         if(!updateProject) throw new Error(`Error updating project with Id: ${id}`);
@@ -53,13 +57,14 @@ export async function updateProjectById(id: string, project: ProjectType): Promi
     }
 }
 
-export async function deleteProjectById(id: string): Promise<IProjectScehma>{
+export async function deleteProjectById(id: string): Promise<void>{
     validateObjectId(id);
+    
     try {   
         const deleteProject = await ProjectModel.findByIdAndDelete(id);
         if(!deleteProject) throw new Error(`Issues deleting project with Id: ${id}`);
 
-        return deleteProject;
+        return;
     } catch (error) {
         throw new Error('Cannot initate delete');
     }

@@ -1,5 +1,4 @@
 const asyncHandler = require('express-async-handler');
-const mongoose = require('mongoose');
 import { Response, Request } from 'express';
 import { createProject, deleteProjectById, getProjectById, getProjects, updateProjectById } from '../services/projectServices';
 
@@ -42,8 +41,8 @@ const updateProjectHandler = asyncHandler(async (req: Request, res: Response) =>
 //@route DELETE /api/projects/:id
 //@access Private
 const deleteProjectHandler = asyncHandler(async (req: Request, res: Response) => {
-    const project = await deleteProjectById(req.params.id);
-    res.status(200).json({ message: `Project ${req.params.id} deleted`, project: project });
+    await deleteProjectById(req.params.id);
+    res.status(200).json({ message: `Project ${req.params.id} deleted` });
 });
 
 module.exports = {
